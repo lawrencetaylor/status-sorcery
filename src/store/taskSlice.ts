@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { format } from 'date-fns';
 
 export interface Task {
   id: string;
@@ -10,14 +9,24 @@ export interface Task {
   category: string | null;
 }
 
+interface CategoryData {
+  name: string;
+  color: string;
+}
+
 interface TaskState {
   tasks: Task[];
-  categories: string[];
+  categories: CategoryData[];
 }
 
 const initialState: TaskState = {
   tasks: [],
-  categories: ['Work', 'Personal', 'Shopping', 'Health']
+  categories: [
+    { name: 'Work', color: '#9b87f5' },
+    { name: 'Personal', color: '#F97316' },
+    { name: 'Shopping', color: '#0EA5E9' },
+    { name: 'Health', color: '#D946EF' }
+  ]
 };
 
 export const taskSlice = createSlice({
@@ -43,15 +52,15 @@ export const taskSlice = createSlice({
         task.dueDate = action.payload.dueDate;
       }
     },
-    addCategory: (state, action: PayloadAction<string>) => {
-      if (!state.categories.includes(action.payload)) {
-        state.categories.push(action.payload);
+    addCategory: (state, action: PayloadAction<{ name: string; color: string }>) => {
+      if (!state.categories.some(cat => cat.name === action.payload.name)) {
+        state.categories.push({ name: action.payload.name, color: action.payload.color });
       }
     },
-    updateCategory: (state, action: PayloadAction<{ oldName: string; newName: string }>) => {
-      const index = state.categories.indexOf(action.payload.oldName);
+    updateCategory: (state, action: PayloadAction<{ oldName: string; newName: string; color: string }>) => {
+      const index = state.categories.findIndex(cat => cat.name === action.payload.oldName);
       if (index !== -1) {
-        state.categories[index] = action.payload.newName;
+        state.categories[index] = { name: action.payload.newName, color: action.payload.color };
         // Update all tasks using this category
         state.tasks.forEach(task => {
           if (task.category === action.payload.oldName) {
@@ -61,7 +70,7 @@ export const taskSlice = createSlice({
       }
     },
     deleteCategory: (state, action: PayloadAction<string>) => {
-      state.categories = state.categories.filter(cat => cat !== action.payload);
+      state.categories = state.categories.filter(cat => cat.name !== action.payload);
       // Remove category from tasks using it
       state.tasks.forEach(task => {
         if (task.category === action.payload) {
