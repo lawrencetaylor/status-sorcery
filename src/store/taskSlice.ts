@@ -47,9 +47,37 @@ export const taskSlice = createSlice({
       if (!state.categories.includes(action.payload)) {
         state.categories.push(action.payload);
       }
+    },
+    updateCategory: (state, action: PayloadAction<{ oldName: string; newName: string }>) => {
+      const index = state.categories.indexOf(action.payload.oldName);
+      if (index !== -1) {
+        state.categories[index] = action.payload.newName;
+        // Update all tasks using this category
+        state.tasks.forEach(task => {
+          if (task.category === action.payload.oldName) {
+            task.category = action.payload.newName;
+          }
+        });
+      }
+    },
+    deleteCategory: (state, action: PayloadAction<string>) => {
+      state.categories = state.categories.filter(cat => cat !== action.payload);
+      // Remove category from tasks using it
+      state.tasks.forEach(task => {
+        if (task.category === action.payload) {
+          task.category = null;
+        }
+      });
     }
   }
 });
 
-export const { addTask, updateTaskStatus, updateTaskDueDate, addCategory } = taskSlice.actions;
+export const { 
+  addTask, 
+  updateTaskStatus, 
+  updateTaskDueDate, 
+  addCategory,
+  updateCategory,
+  deleteCategory 
+} = taskSlice.actions;
 export default taskSlice.reducer;
