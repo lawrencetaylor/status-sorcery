@@ -1,9 +1,10 @@
 import { format } from 'date-fns';
 import { Calendar } from 'lucide-react';
 import { Draggable } from 'react-beautiful-dnd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateTaskDueDate } from '../store/taskSlice';
 import type { Task } from '../store/taskSlice';
+import type { RootState } from '../store/store';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import {
@@ -20,6 +21,8 @@ interface TaskCardProps {
 
 export const TaskCard = ({ task, index }: TaskCardProps) => {
   const dispatch = useDispatch();
+  const categories = useSelector((state: RootState) => state.tasks.categories);
+  const categoryData = categories.find(cat => cat.name === task.category);
 
   return (
     <Draggable draggableId={task.id} index={index}>
@@ -58,10 +61,17 @@ export const TaskCard = ({ task, index }: TaskCardProps) => {
                 />
               </PopoverContent>
             </Popover>
-            {task.category && (
-              <Badge variant="secondary">
+            {task.category && categoryData && (
+              <div 
+                className="px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                style={{ 
+                  backgroundColor: `${categoryData.color}20`,
+                  color: categoryData.color,
+                  border: `1px solid ${categoryData.color}40`
+                }}
+              >
                 {task.category}
-              </Badge>
+              </div>
             )}
           </div>
         </div>
