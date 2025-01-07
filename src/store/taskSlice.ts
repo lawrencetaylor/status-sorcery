@@ -7,14 +7,17 @@ export interface Task {
   description: string;
   status: 'todo' | 'inProgress' | 'done';
   dueDate: string | null;
+  category: string | null;
 }
 
 interface TaskState {
   tasks: Task[];
+  categories: string[];
 }
 
 const initialState: TaskState = {
-  tasks: []
+  tasks: [],
+  categories: ['Work', 'Personal', 'Shopping', 'Health']
 };
 
 export const taskSlice = createSlice({
@@ -39,9 +42,14 @@ export const taskSlice = createSlice({
       if (task) {
         task.dueDate = action.payload.dueDate;
       }
+    },
+    addCategory: (state, action: PayloadAction<string>) => {
+      if (!state.categories.includes(action.payload)) {
+        state.categories.push(action.payload);
+      }
     }
   }
 });
 
-export const { addTask, updateTaskStatus, updateTaskDueDate } = taskSlice.actions;
+export const { addTask, updateTaskStatus, updateTaskDueDate, addCategory } = taskSlice.actions;
 export default taskSlice.reducer;

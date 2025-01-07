@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addTask } from '../store/taskSlice';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,12 +11,22 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { RootState } from '../store/store';
 
 export const NewTaskDialog = () => {
   const dispatch = useDispatch();
+  const categories = useSelector((state: RootState) => state.tasks.categories);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +35,12 @@ export const NewTaskDialog = () => {
         title,
         description,
         status: 'todo',
-        dueDate: null
+        dueDate: null,
+        category
       }));
       setTitle('');
       setDescription('');
+      setCategory(null);
       setOpen(false);
     }
   };
@@ -56,6 +68,20 @@ export const NewTaskDialog = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+          <div>
+            <Select value={category || ''} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Button type="submit">Create Task</Button>
         </form>

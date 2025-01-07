@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
 
 interface TaskCardProps {
   task: Task;
@@ -33,7 +34,7 @@ export const TaskCard = ({ task, index }: TaskCardProps) => {
         >
           <h3 className="font-semibold mb-2">{task.title}</h3>
           <p className="text-sm text-gray-600 mb-3">{task.description}</p>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="h-8 text-xs">
@@ -57,6 +58,11 @@ export const TaskCard = ({ task, index }: TaskCardProps) => {
                 />
               </PopoverContent>
             </Popover>
+            {task.category && (
+              <Badge variant="secondary">
+                {task.category}
+              </Badge>
+            )}
           </div>
         </div>
       )}
