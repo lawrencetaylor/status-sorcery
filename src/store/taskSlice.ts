@@ -10,24 +10,14 @@ export interface Task {
   category: string | null;
 }
 
-interface CategoryData {
-  name: string;
-  color: string;
-}
-
 interface TaskState {
   tasks: Task[];
-  categories: CategoryData[];
+  categories: string[];
 }
 
 const initialState: TaskState = {
   tasks: [],
-  categories: [
-    { name: 'Work', color: '#9b87f5' },
-    { name: 'Personal', color: '#F97316' },
-    { name: 'Shopping', color: '#0EA5E9' },
-    { name: 'Health', color: '#D946EF' }
-  ]
+  categories: ['Work', 'Personal', 'Shopping', 'Health']
 };
 
 export const taskSlice = createSlice({
@@ -53,18 +43,15 @@ export const taskSlice = createSlice({
         task.dueDate = action.payload.dueDate;
       }
     },
-    addCategory: (state, action: PayloadAction<{ name: string; color: string }>) => {
-      if (!state.categories.some(cat => cat.name === action.payload.name)) {
+    addCategory: (state, action: PayloadAction<string>) => {
+      if (!state.categories.includes(action.payload)) {
         state.categories.push(action.payload);
       }
     },
-    updateCategory: (state, action: PayloadAction<{ oldName: string; newName: string; color: string }>) => {
-      const index = state.categories.findIndex(cat => cat.name === action.payload.oldName);
+    updateCategory: (state, action: PayloadAction<{ oldName: string; newName: string }>) => {
+      const index = state.categories.indexOf(action.payload.oldName);
       if (index !== -1) {
-        state.categories[index] = { 
-          name: action.payload.newName, 
-          color: action.payload.color 
-        };
+        state.categories[index] = action.payload.newName;
         // Update all tasks using this category
         state.tasks.forEach(task => {
           if (task.category === action.payload.oldName) {
@@ -74,7 +61,7 @@ export const taskSlice = createSlice({
       }
     },
     deleteCategory: (state, action: PayloadAction<string>) => {
-      state.categories = state.categories.filter(cat => cat.name !== action.payload);
+      state.categories = state.categories.filter(cat => cat !== action.payload);
       // Remove category from tasks using it
       state.tasks.forEach(task => {
         if (task.category === action.payload) {
